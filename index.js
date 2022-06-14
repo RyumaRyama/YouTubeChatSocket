@@ -19,8 +19,9 @@ axios(channelUrl).then(res => {
   const wss = new WebSocket.Server({ port: port });
   const liveChat = new LiveChat({channelId: channelId});
   liveChat.on('start', chatItem => {
-    console.log('start');
-    console.log(chatItem);
+    const title = JSON.parse(chatItem).title;
+    console.log('Start!!!');
+    console.log(`Title: ${title}`);
   });
   liveChat.on('error', error => {
     console.log(error);
@@ -44,7 +45,7 @@ axios(channelUrl).then(res => {
         data.type = 'milestone';
       }
 
-      console.log(JSON.parse(JSON.stringify(data)));
+      // console.log(JSON.parse(JSON.stringify(data)));
       ws.send(JSON.stringify(data));
     });
   });
