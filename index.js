@@ -24,7 +24,9 @@ axios(channelUrl).then(res => {
     console.log(`Title: ${title}`);
   });
   liveChat.on('error', error => {
-    console.log(error);
+    fs.appendFileSync('error_log.txt', '--------------------------\n');
+    fs.appendFileSync('error_log.txt', Date()+'\n');
+    fs.appendFileSync('error_log.txt', error.toString() + '\n');
   });
   liveChat.start();
 
@@ -45,7 +47,6 @@ axios(channelUrl).then(res => {
         data.type = 'milestone';
       }
 
-      // console.log(JSON.parse(JSON.stringify(data)));
       ws.send(JSON.stringify(data));
     });
   });
