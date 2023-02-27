@@ -2,22 +2,13 @@ const fs = require('fs')
 const path = require('path')
 const axios = require('axios');
 
-// 接続先配信
-const channelUrl = fs.readFileSync(path.resolve(__dirname, './channelUrl'), 'utf8');
-
 // websocketポート設定
 const port = parseInt(fs.readFileSync(path.resolve(__dirname, 'port'), 'utf8'));
 
-// 配信に接続
-axios(channelUrl).then(res => {
-  // youtube-chatでの取得初期化
-  const { LiveChat } = require("./dist/index");
-  const channelId = res.data.match(/<meta itemprop="channelId" content="(.+?)">/)[1];
-
+const ConnectionStart = (liveChat) => {
   // チャット情報のwebsocket配信
   const WebSocket = require('ws');
   const wss = new WebSocket.Server({ port: port });
-  const liveChat = new LiveChat({channelId: channelId});
   liveChat.on('start', chatItem => {
     const title = JSON.parse(chatItem).title;
     console.log('Start!!!');
@@ -50,4 +41,30 @@ axios(channelUrl).then(res => {
       ws.send(JSON.stringify(data));
     });
   });
-});
+};
+
+// youtube-chatでの取得初期化
+const { LiveChat } = require("./dist/index");
+
+if ( fs.existsSync( path.resolve(__dirname, 'liveUrl') ) ){
+  const liveUrl = fs.readFileSync(path.resolve(__dirname, 'liveUrl'), 'utf8');
+
+  const liveId = liveUrl.match(/\?v=(.+?)($|&)/)[1];
+
+  const liveChat = new LiveChat({liveId: liveId});
+
+  ConnectionStart(liveChat);
+}
+else {
+  // 接続先配信
+  const channelUrl = fs.readFileSync(path.resolve(__dirname, 'channelUrl'), 'utf8');
+
+  // 配信に接続
+  axios(channelUrl).then(res => {
+    const channelId = res.data.match(/<meta itemprop="channelId" content="(.+?)">/)[1];
+
+    const liveChat = new LiveChat({channelId: channelId});
+
+    ConnectionStart(liveChat);
+  });
+}
