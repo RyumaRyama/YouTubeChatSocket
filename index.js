@@ -49,11 +49,14 @@ const { LiveChat } = require("./dist/index");
 if ( fs.existsSync( path.resolve(__dirname, 'liveUrl') ) ){
   const liveUrl = fs.readFileSync(path.resolve(__dirname, 'liveUrl'), 'utf8');
 
-  const liveId = liveUrl.match(/\?v=(.+?)($|&)/)[1];
+  // 配信に接続
+  axios(liveUrl).then(res => {
+    const liveId = res.data.match(/<meta itemprop="videoId" content="(.+?)">/)[1];
 
-  const liveChat = new LiveChat({liveId: liveId});
+    const liveChat = new LiveChat({liveId: liveId});
 
-  ConnectionStart(liveChat);
+    ConnectionStart(liveChat);
+  });
 }
 else {
   // 接続先配信
