@@ -51,7 +51,7 @@ if ( fs.existsSync( path.resolve(__dirname, 'liveUrl') ) ){
 
   // 配信に接続
   axios(liveUrl).then(res => {
-    const liveId = res.data.match(/<meta itemprop="videoId" content="(.+?)">/)[1];
+    const liveId = res.data.match(/"videoDetails":{"videoId":"(.+?)"/)[1];
 
     const liveChat = new LiveChat({liveId: liveId});
 
@@ -64,7 +64,7 @@ else {
 
   // 配信に接続
   axios(channelUrl).then(res => {
-    const channelId = res.data.match(/<meta itemprop="channelId" content="(.+?)">/)[1];
+    const channelId = res.data.match(/"channelId":"(.+?)"/)[1];
 
     const liveChat = new LiveChat({channelId: channelId});
 
